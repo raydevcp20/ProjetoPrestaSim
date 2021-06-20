@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+<title>Cadastro Usuário</title>
+</head>
+
+<body>
+	<div class="container">
+
+		<div class="text-center">
+			<img src="/img/logo.png" width="300" height="300"
+				alt="logo Prestasim">
+		</div>
+		<h1 class="text-center" style="color: #115571;">Cadastro de Usuário</h1>
+		<div id="toast-place"></div>
+		
+		<form class="p-2 mb-5 rounded text-white" action="/salvarUsuario"
+			method="post" id="form" th:object="${usuario}"
+			style="background-color: #32AFB4;">
+			<div class="form-group">
+				<input type="hidden" th:field="*{codigo}"> <label
+					for="exampleFormControlSelect1">Nome de usuário</label> <input
+					class="form-control" th:field="*{login}"
+					id="exampleFormControlSelect2" type="text" required> <label
+					for="exampleFormControlSelect1">Senha</label> <input
+					class="form-control" th:field="*{senha}" id="senha" type="password"
+					required> <label for="exampleFormControlSelect1">Repita
+					a Senha</label> <input class="form-control" id="senha2" type="password"
+					required>
+			</div>
+			<div class="text-danger" th:text="${classErrorFunc}"></div>
+			<button type="submit" class="btn btn-success">Enviar</button>
+		</form>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+		integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+		crossorigin="anonymous"></script>
+	<script> 
+			var form = document.getElementById('form');
+	
+			form.addEventListener('submit', function (e) {
+				var senha1 = document.getElementById("senha").value;
+			    var senha2 = document.getElementById("senha2").value;
+			    
+			    if (senha1 != senha2) {
+			        document.getElementById("senha2").style.border = "red 3px solid";
+			        $(document).ready(function(){
+			            $('#toast-place').append(`
+			                <div class="toast popup" data-autohide="false">
+			                    <div class="toast-header">
+			                        <strong class="mr-auto text-primary">Senhas diferentes</strong>
+			                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+			                    </div>
+			                    <div class="toast-body">
+			                        A primeira senha deve ser exatamente igual a segunda.
+			                    </div>
+			                </div>
+			            `);
+			            $('.toast').toast('show');
+			        });
+			        e.preventDefault();
+			    } else {
+			        document.getElementById("senha2").style.border = "green 3px solid";   
+			    }
+			});
+		</script>
+</body>
+
+</html>

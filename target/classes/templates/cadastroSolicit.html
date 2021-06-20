@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+		integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('#vTotal').val(0);
+            $('#DiasServ').blur(function( )
+            {
+                
+                var DiasServ = $('#DiasServ').val();
+                var valorServico = $('#valorServico').val();
+                $('#vTotal').val( DiasServ * valorServico );
+
+            });
+			
+			
+			
+			$('#profissional').change(function()
+            {
+				//alert("teste");
+                var idProfissional = $('#profissional').val();
+                
+                $.get('/carregarPrecoServico', {
+
+                    'idProfissional' : idProfissional
+        
+                }, function(dadosJSON) {
+					//como pesquisar - exemplo ajax springboot
+                    $('#valorServico').val(dadosJSON.valorDiaria);
+                    $('#tipoServ').val(dadosJSON.nome);
+
+                });
+
+            });
+        });
+		
+	</script>
+	<title>Cadastro Solicitações</title>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-md navbar-primary bg-light">
+		<a class="navbar-brand"> 
+			<img src="/img/logo.png" width="50" class="d-inline-block align-top" alt="" loading="lazy">
+		</a>
+		
+		<div class="collapse navbar-collapse text-dark" id="navbarText" navbar>
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="/rankingProfi" role="button">Melhores Profissionais</a>
+				</li>
+				<form class="form-inline" method="post" th:object="${usuarioLogado}">
+					<li class="nav-item active">
+						<a class="nav-link" th:href="|/adm/alterarUser?id=*{codigo}|" role="button">Alterar conta</a>
+					</li>
+					<li class="nav-item active">
+						<a class="nav-link text-primary" role="button" data-toggle="modal" data-target="#exampleModalCenter" style="cursor:pointer;">Desativar conta</a>
+						
+						<!-- Modal -->
+						<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="exampleModalCenterTitle">Desativar conta?</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									
+									<div class="modal-body">Tem certeza que deseja desativar sua conta? A operação não poderá ser revertida!</div>
+									
+									<div class="modal-footer">
+										<a type="button" class="btn btn-secondary text-light btn-sm" data-dismiss="modal">Cancelar</a>
+										<a type="button" th:href="|/adm/DesativarUser?id=*{codigo}|" 
+											class="btn btn-primary btn-sm active text-light" role="button"
+											aria-pressed="true">Sim, prosseguir
+										</a>
+									</div>
+								
+								</div>
+							</div>
+						</div>
+
+					</li>
+				</form>
+			</ul>
+			
+			<form class="mr-3" method="post" th:object="${usuarioLogado}">
+				Olá, <span th:text="*{login}" id="exampleFormControlSelect1"></span>
+			</form>
+			
+			<a class="btn btn-danger" href="/sair" role="button">Sair</a>
+		</div>
+	</nav>
+
+
+	<div class="container">
+
+		<div class="text-center">
+			<img src="/img/logo.png" width="300" height="300" alt="logo Prestasim">
+		</div>
+		<h1 class="text-center" style="color: #115571;">Cadastro de Solicitações</h1>
+
+		<form class="p-2 mb-5 rounded text-white" action="/salvarSolicitacao" method="post" th:object="${solicita}" style="background-color: #32AFB4;">
+			<div class="form-group">
+				<input type="hidden" name="login" th:value="${usuarioLogado.codigo}">
+			
+				<input type="hidden" th:field="*{id}">
+				<label for="exampleFormControlSelect1">Nome do Solicitante</label>
+				<input class="form-control" th:field="*{nomeSolicitante}" id="exampleFormControlSelect2" type="text" required>
+			</div>
+			<div class="form-group">
+				<label for="profissional">Selecione o Profissional</label>
+				<select class="form-control" th:field="*{profissional}" id="profissional">
+					<option th:each="prof : ${lista_Profissional}" th:value="${prof.id}" th:text="${prof.nome}"></option>
+				</select>
+				<label for="tipoServ">Tipo de serviço do profissional:</label>
+				<input class="form-control"  id="tipoServ" type="text" disabled>
+			</div>
+			<div class="form-group">
+				<label for="exampleFormControlSelect1">Data da Solicitação</label>
+				<input class="form-control" th:field="*{data}" id="exampleFormControlSelect2" type="date" required>
+				<label for="DiasServ">Quantidade em dias de serviço</label>
+				
+				
+				<input class="form-control" th:field="*{DiasdeServ}" id="DiasServ" type="number" required>
+				
+				
+				Valor do Serviço/dia: R$ <input type="text" value="0" id="valorServico" readonly="readonly" size="5" style="background-color:#32AFB4; border:none; color:#fff"><br>
+				Valor Total: R$ <input type="text" id="vTotal" th:field="*{ValorTotal}" readonly="readonly" size="5" style="background-color:#32AFB4; border:none; color:#fff">
+				<br>
+				
+				<label for="exampleFormControlTextarea1">Descrição do pedido</label>
+				<textarea class="form-control" th:field="*{descricaoPedido}" id="exampleFormControlTextarea1" rows="3" required></textarea>
+			</div>
+			<div class="text-danger" th:text="${classErrorSolic}"></div>
+			<div class="text-danger" th:text="${vTotal}"></div>
+			<button type="submit" class="btn btn-success">Enviar</button>
+		</form>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+		integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>
